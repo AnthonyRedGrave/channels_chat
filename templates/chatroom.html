@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<textarea name="area" id="chat-text" cols="80" rows="30"></textarea><br>
+<input type="text" id="input" size="80"><br>
+<input type="button" id="submit" value="Send">
+
+<script>
+
+    document.querySelector('#submit').onclick = function (e){
+        let messageInputDom = document.querySelector('#input')
+        let message = messageInputDom.value
+        chatSocket.send(JSON.stringify({
+            'message': message,
+
+        }))
+        messageInputDom.value = ''
+    }
+
+    var room_name = {{ room_name }}
+    console.log(room_name)
+    const chatSocket = new WebSocket(
+        'ws://'+
+        window.location.host +
+        '/ws/chat/' +
+        "{{ room_name }}" +
+        '/'
+    )
+
+    chatSocket.onmessage = function(e){
+        const data = JSON.parse(e.data)
+        console.log(data)
+        const chat_text = document.querySelector('#chat-text').value += (data.message + '\n')
+    }
+</script>
+{% endblock %}
